@@ -109,7 +109,7 @@ class Snake(GameObject):
         """Сбрасывает змейку в начальное состояние."""
         global SPEED
         SPEED = 15
-        
+
         self.length = 1
         self.positions = [(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)]
         self.direction = random.choice([UP, DOWN, LEFT, RIGHT])
