@@ -1,4 +1,5 @@
 import random
+
 import pygame
 
 # Константы для размеров поля и сетки:
@@ -24,10 +25,11 @@ SPEED = 20
 
 # Настройка игрового окна:
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), 0, 32)
-pygame.display.set_caption("Изгиб Питона")
+pygame.display.set_caption('Изгиб Питона')
 
 # Настройка времени:
 clock = pygame.time.Clock()
+
 
 class GameObject:
     """Базовый класс для игровых объектов."""
