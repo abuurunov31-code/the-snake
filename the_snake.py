@@ -378,7 +378,7 @@ class Button:
             self.action()
 
 
-def show_menu(
+def show_menu(  # noqa: C901
     screen: pygame.Surface,
     clock: pygame.time.Clock
 ) -> dict:
@@ -394,7 +394,7 @@ def show_menu(
 
     try:
         click_sound = pygame.mixer.Sound('click.wav')
-    except Exception:
+    except (pygame.error, IOError):  # noqa: PIE786
         click_sound = None
 
     def start_game() -> None:
@@ -507,7 +507,7 @@ def show_menu(
             ),
             Button(
                 f"{t['apple_shape']}: "
-                f"{APPLE_SHAPES[settings['apple_shape_idx']]}",
+                f"{APPLE_SHAPES[settings['apple_shape_idx']]}",  # noqa: FCS100
                 170, 330, 300, 35, (200, 150, 255), cycle_apple_shape, s
             ),
             Button(
@@ -560,14 +560,14 @@ def show_menu(
     return settings
 
 
-def main() -> None:
+def main() -> None:  # noqa: C901
     """Основной игровой цикл."""
     pygame.init()
     try:
         pygame.mixer.init()
         eat_sound = pygame.mixer.Sound('eat.wav')
         crash_sound = pygame.mixer.Sound('crash.wav')
-    except Exception:
+    except (pygame.error, IOError):  # noqa: PIE786
         eat_sound = None
         crash_sound = None
 
