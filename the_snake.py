@@ -378,15 +378,103 @@ class Button:
             self.action()
 
 
-def show_menu(  # noqa: C901
+# --- МЕНЮ ---
+def draw_main_menu(
     screen: pygame.Surface,
-    clock: pygame.time.Clock
-) -> dict:
+    t: dict,
+    click_sound: Optional[pygame.mixer.Sound],
+    actions: dict
+) -> List[Button]:
+    """Отрисовывает главное меню и возвращает кнопки."""
+    screen.fill(BOARD_BACKGROUND_COLOR)
+    s = click_sound
+    return [
+        Button(t['play'], 220, 100, 200, 50, (100, 255, 100),
+               actions['play'], s),
+        Button(t['settings'], 220, 170, 200, 50, (255, 255, 100),
+               actions['settings'], s),
+        Button(t['records'], 220, 240, 200, 50, (255, 215, 0),
+               actions['records'], s),
+        Button(t['exit'], 220, 310, 200, 50, (255, 100, 100),
+               actions['exit'], s),
+    ]
+
+
+def draw_settings_menu(
+    screen: pygame.Surface,
+    t: dict,
+    settings: dict,
+    click_sound: Optional[pygame.mixer.Sound],
+    actions: dict
+) -> List[Button]:
+    """Отрисовывает меню настроек и возвращает кнопки."""
+    screen.fill(BOARD_BACKGROUND_COLOR)
+    title = pygame.font.Font(None, 50).render(
+        t['settings'], True, TEXT_COLOR
+    )
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 10))
+
+    diff_map = {'Easy': t['easy'], 'Normal': t['normal'], 'Hard': t['hard']}
+    s = click_sound
+
+    return [
+        Button(f"{t['speed']}: {settings['speed']}",
+               170, 60, 300, 35, (255, 200, 200),
+               actions['cycle_speed'], s),
+        Button(f"{t['difficulty']}: {diff_map[settings['difficulty']]}",
+               170, 105, 300, 35, (200, 200, 255),
+               actions['toggle_diff'], s),
+        Button(f"{t['sound']}: {t['on'] if settings['sound'] else t['off']}",
+               170, 150, 300, 35, (200, 255, 200),
+               actions['toggle_sound'], s),
+        Button(f"{t['lang_btn']}: {settings['lang'].upper()}",
+               170, 195, 300, 35, (255, 255, 150),
+               actions['cycle_lang'], s),
+        Button(f"{t['snake_color']}: {settings['snake_color_idx'] + 1}",
+               170, 240, 300, 35, (150, 255, 255),
+               actions['cycle_snake'], s),
+        Button(f"{t['apple_color']}: {settings['apple_color_idx'] + 1}",
+               170, 285, 300, 35, (255, 200, 150),
+               actions['cycle_apple'], s),
+        Button(f"{t['apple_shape']}: "
+               f"{APPLE_SHAPES[settings['apple_shape_idx']]}",
+               170, 330, 300, 35, (200, 150, 255),
+               actions['cycle_shape'], s),
+        Button(t['back'], 220, 400, 200, 40, (100, 100, 255),
+               actions['back'], s),
+    ]
+
+
+def draw_records_menu(
+    screen: pygame.Surface,
+    t: dict,
+    click_sound: Optional[pygame.mixer.Sound],
+    actions: dict
+) -> List[Button]:
+    """Отрисовывает меню рекордов и возвращает кнопки."""
+    screen.fill(BOARD_BACKGROUND_COLOR)
+    title = pygame.font.Font(None, 50).render(
+        t['records'], True, TEXT_COLOR
+    )
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
+    highscore = load_highscore()
+    score_text = pygame.font.Font(None, 50).render(
+        f"{t['best']}: {highscore}", True, HIGHLIGHT_COLOR
+    )
+    screen.blit(
+        score_text,
+        (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 180)
+    )
+    return [
+        Button(t['back'], 220, 380, 200, 50, (100, 100, 255),
+               actions['back'], click_sound)
+    ]
+
+
+def show_menu(screen: pygame.Surface, clock: pygame.time.Clock) -> dict:
     """Отображает главное меню."""
     menu_running = True
     current_screen = 'main'
-    font_title = pygame.font.Font(None, 50)
-
     settings = {
         'speed': 20, 'difficulty': 'Normal', 'sound': True, 'lang': 'ru',
         'snake_color_idx': 0, 'apple_color_idx': 0, 'apple_shape_idx': 0
@@ -394,7 +482,7 @@ def show_menu(  # noqa: C901
 
     try:
         click_sound = pygame.mixer.Sound('click.wav')
-    except (pygame.error, IOError):  # noqa: PIE786
+    except (pygame.error, IOError):
         click_sound = None
 
     def start_game() -> None:
@@ -415,135 +503,65 @@ def show_menu(  # noqa: C901
             (langs.index(settings['lang']) + 1) % len(langs)
         ]
 
-    def draw_main_menu() -> List[Button]:
-        screen.fill(BOARD_BACKGROUND_COLOR)
-        t = translations[settings['lang']]
-        s = click_sound if settings['sound'] else None
-        return [
-            Button(
-                t['play'], 220, 100, 200, 50, (100, 255, 100),
-                start_game, s
-            ),
-            Button(
-                t['settings'], 220, 170, 200, 50, (255, 255, 100),
-                lambda: set_screen('settings'), s
-            ),
-            Button(
-                t['records'], 220, 240, 200, 50, (255, 215, 0),
-                lambda: set_screen('records'), s
-            ),
-            Button(
-                t['exit'], 220, 310, 200, 50, (255, 100, 100),
-                quit_game, s
-            ),
+    def cycle_speed() -> None:
+        speeds = [10, 15, 20, 25, 30, 35]
+        settings['speed'] = speeds[
+            (speeds.index(settings['speed']) + 1) % len(speeds)
         ]
 
-    def draw_settings_menu() -> List[Button]:
-        screen.fill(BOARD_BACKGROUND_COLOR)
-        t = translations[settings['lang']]
-        title = font_title.render(t['settings'], True, TEXT_COLOR)
-        screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 10))
-
-        def cycle_speed() -> None:
-            speeds = [10, 15, 20, 25, 30, 35]
-            settings['speed'] = speeds[
-                (speeds.index(settings['speed']) + 1) % len(speeds)
-            ]
-
-        def toggle_difficulty() -> None:
-            levels = ['Easy', 'Normal', 'Hard']
-            settings['difficulty'] = levels[
-                (levels.index(settings['difficulty']) + 1) % len(levels)
-            ]
-
-        def toggle_sound() -> None:
-            settings['sound'] = not settings['sound']
-
-        def cycle_snake_color() -> None:
-            settings['snake_color_idx'] = (
-                settings['snake_color_idx'] + 1
-            ) % len(SNAKE_COLORS)
-
-        def cycle_apple_color() -> None:
-            settings['apple_color_idx'] = (
-                settings['apple_color_idx'] + 1
-            ) % len(APPLE_COLORS)
-
-        def cycle_apple_shape() -> None:
-            settings['apple_shape_idx'] = (
-                settings['apple_shape_idx'] + 1
-            ) % len(APPLE_SHAPES)
-
-        diff_map = {
-            'Easy': t['easy'], 'Normal': t['normal'], 'Hard': t['hard']
-        }
-        s = click_sound if settings['sound'] else None
-
-        return [
-            Button(
-                f"{t['speed']}: {settings['speed']}",
-                170, 60, 300, 35, (255, 200, 200), cycle_speed, s
-            ),
-            Button(
-                f"{t['difficulty']}: {diff_map[settings['difficulty']]}",
-                170, 105, 300, 35, (200, 200, 255), toggle_difficulty, s
-            ),
-            Button(
-                f"{t['sound']}: "
-                f"{t['on'] if settings['sound'] else t['off']}",
-                170, 150, 300, 35, (200, 255, 200), toggle_sound, s
-            ),
-            Button(
-                f"{t['lang_btn']}: {settings['lang'].upper()}",
-                170, 195, 300, 35, (255, 255, 150), cycle_lang, s
-            ),
-            Button(
-                f"{t['snake_color']}: {settings['snake_color_idx'] + 1}",
-                170, 240, 300, 35, (150, 255, 255), cycle_snake_color, s
-            ),
-            Button(
-                f"{t['apple_color']}: {settings['apple_color_idx'] + 1}",
-                170, 285, 300, 35, (255, 200, 150), cycle_apple_color, s
-            ),
-            Button(
-                f"{t['apple_shape']}: "
-                f"{APPLE_SHAPES[settings['apple_shape_idx']]}",  # noqa: FCS100
-                170, 330, 300, 35, (200, 150, 255), cycle_apple_shape, s
-            ),
-            Button(
-                t['back'], 220, 400, 200, 40, (100, 100, 255),
-                lambda: set_screen('main'), s
-            ),
+    def toggle_diff() -> None:
+        levels = ['Easy', 'Normal', 'Hard']
+        settings['difficulty'] = levels[
+            (levels.index(settings['difficulty']) + 1) % len(levels)
         ]
 
-    def draw_records_menu() -> List[Button]:
-        screen.fill(BOARD_BACKGROUND_COLOR)
-        t = translations[settings['lang']]
-        title = font_title.render(t['records'], True, TEXT_COLOR)
-        screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
-        highscore = load_highscore()
-        score_text = pygame.font.Font(None, 50).render(
-            f"{t['best']}: {highscore}", True, HIGHLIGHT_COLOR
-        )
-        screen.blit(
-            score_text,
-            (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 180)
-        )
-        s = click_sound if settings['sound'] else None
-        return [
-            Button(
-                t['back'], 220, 380, 200, 50, (100, 100, 255),
-                lambda: set_screen('main'), s
-            )
-        ]
+    def toggle_sound() -> None:
+        settings['sound'] = not settings['sound']
+
+    def cycle_snake() -> None:
+        settings['snake_color_idx'] = (
+            settings['snake_color_idx'] + 1
+        ) % len(SNAKE_COLORS)
+
+    def cycle_apple() -> None:
+        settings['apple_color_idx'] = (
+            settings['apple_color_idx'] + 1
+        ) % len(APPLE_COLORS)
+
+    def cycle_shape() -> None:
+        settings['apple_shape_idx'] = (
+            settings['apple_shape_idx'] + 1
+        ) % len(APPLE_SHAPES)
+
+    def go_back() -> None:
+        set_screen('main')
+
+    actions = {
+        'play': start_game,
+        'settings': lambda: set_screen('settings'),
+        'records': lambda: set_screen('records'),
+        'exit': quit_game,
+        'back': go_back,
+        'cycle_speed': cycle_speed,
+        'toggle_diff': toggle_diff,
+        'toggle_sound': toggle_sound,
+        'cycle_lang': cycle_lang,
+        'cycle_snake': cycle_snake,
+        'cycle_apple': cycle_apple,
+        'cycle_shape': cycle_shape,
+    }
 
     while menu_running:
+        t = translations[settings['lang']]
+
         if current_screen == 'main':
-            buttons = draw_main_menu()
+            buttons = draw_main_menu(screen, t, click_sound, actions)
         elif current_screen == 'settings':
-            buttons = draw_settings_menu()
+            buttons = draw_settings_menu(
+                screen, t, settings, click_sound, actions
+            )
         elif current_screen == 'records':
-            buttons = draw_records_menu()
+            buttons = draw_records_menu(screen, t, click_sound, actions)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -560,14 +578,14 @@ def show_menu(  # noqa: C901
     return settings
 
 
-def main() -> None:  # noqa: C901
+def main() -> None:
     """Основной игровой цикл."""
     pygame.init()
     try:
         pygame.mixer.init()
         eat_sound = pygame.mixer.Sound('eat.wav')
         crash_sound = pygame.mixer.Sound('crash.wav')
-    except (pygame.error, IOError):  # noqa: PIE786
+    except (pygame.error, IOError):
         eat_sound = None
         crash_sound = None
 
@@ -590,23 +608,16 @@ def main() -> None:  # noqa: C901
     font_score = pygame.font.Font(None, 30)
 
     obstacles = []
-    if difficulty == 'Normal':
-        for _ in range(10):
-            obstacles.append(Obstacle((
-                random.randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-                random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-            )))
-    elif difficulty == 'Hard':
-        for _ in range(20):
-            obstacles.append(Obstacle((
-                random.randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-                random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-            )))
+    for _ in range(10 if difficulty == 'Normal' else 20):
+        obstacles.append(Obstacle((
+            random.randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+            random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+        )))
 
-    golden_apple = None
     snake = Snake(color=snake_color)
     apple = Apple(color=apple_color, shape=apple_shape)
     apple.randomize_position(obstacles, snake.positions)
+    golden_apple = None
 
     running = True
     while running:
@@ -633,7 +644,6 @@ def main() -> None:  # noqa: C901
         )
 
         is_alive = next_head not in snake.positions[:-1]
-
         if snake.get_head_position() in [obs.position for obs in obstacles]:
             is_alive = False
 
@@ -656,7 +666,6 @@ def main() -> None:  # noqa: C901
             if eat_sound and sound_enabled:
                 eat_sound.play()
             score += 10
-
             if random.random() < 0.2 and golden_apple is None:
                 golden_apple = GoldenApple(shape=apple_shape)
                 golden_apple.randomize_position(obstacles, snake.positions)
@@ -672,7 +681,6 @@ def main() -> None:  # noqa: C901
                     eat_sound.play()
 
         screen.fill(BOARD_BACKGROUND_COLOR)
-
         for obs in obstacles:
             obs.draw(screen)
         apple.draw(screen)
@@ -686,7 +694,6 @@ def main() -> None:  # noqa: C901
         highscore_text = font_score.render(
             f"{t['best']}: {highscore}", True, HIGHLIGHT_COLOR
         )
-
         screen.blit(score_text, (10, 10))
         screen.blit(
             highscore_text,
