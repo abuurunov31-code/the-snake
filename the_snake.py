@@ -24,6 +24,13 @@ LEFT = (-1, 0)
 RIGHT = (1, 0)
 HIGHSCORE_FILE = 'highscore.txt'
 
+# --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (ТРЕБУЮТСЯ ТЕСТАМИ) ---
+pygame.init()
+pygame.mixer.init()
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption('Змейка')
+clock = pygame.time.Clock()
+
 
 def load_highscore() -> int:
     """Загружает рекорд из файла."""
@@ -161,7 +168,7 @@ class Snake(GameObject):
 
 
 # --- ИГРОВОЙ ЦИКЛ ---
-def handle_input(snake: Snake) -> None:
+def handle_keys(snake: Snake) -> None:
     """Обрабатывает нажатия клавиш."""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -179,36 +186,29 @@ def handle_input(snake: Snake) -> None:
 
 
 def draw_game(
-    screen: pygame.Surface,
+    surface: pygame.Surface,
     snake: Snake,
     apple: Apple,
     score: int,
     highscore: int
 ) -> None:
     """Отрисовывает игровой процесс."""
-    screen.fill(BOARD_BACKGROUND_COLOR)
-    apple.draw(screen)
-    snake.draw(screen)
+    surface.fill(BOARD_BACKGROUND_COLOR)
+    apple.draw(surface)
+    snake.draw(surface)
     font = pygame.font.Font(None, 30)
     score_text = font.render(f'Очки: {score}', True, TEXT_COLOR)
     highscore_text = font.render(
         f'Рекорд: {highscore}', True, HIGHLIGHT_COLOR
     )
-    screen.blit(score_text, (10, 10))
-    screen.blit(
+    surface.blit(score_text, (10, 10))
+    surface.blit(
         highscore_text, (SCREEN_WIDTH - 150, 10)
     )
 
 
 def main() -> None:
     """Основной игровой цикл."""
-    pygame.init()
-    pygame.mixer.init()
-
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption('Змейка')
-    clock = pygame.time.Clock()
-
     speed = 15
     score = 0
     highscore = load_highscore()
@@ -219,7 +219,7 @@ def main() -> None:
 
     running = True
     while running:
-        handle_input(snake)
+        handle_keys(snake)
         snake.update_direction()
 
         head_x, head_y = snake.get_head_position()
