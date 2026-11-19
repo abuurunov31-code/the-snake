@@ -368,10 +368,13 @@ def draw_settings_menu(
     )
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 10))
     diff_map = {'Easy': t['easy'], 'Normal': t['normal'], 'Hard': t['hard']}
-    
+
     sound_text = f"{t['sound']}: "
     sound_text += t['on'] if st['sound'] else t['off']
-    
+
+    shape_text = f"{t['apple_shape']}: "
+    shape_text += APPLE_SHAPES[st['apple_shape_idx']]
+
     return [
         Button(
             f"{t['speed']}: {st['speed']}",
@@ -398,7 +401,7 @@ def draw_settings_menu(
             170, 285, 300, 35, (255, 200, 150), a['ac'], s
         ),
         Button(
-            f"{t['apple_shape']}: {APPLE_SHAPES[st['apple_shape_idx']]}",
+            shape_text,
             170, 330, 300, 35, (200, 150, 255), a['ash'], s
         ),
         Button(
@@ -461,44 +464,56 @@ def show_menu(screen: pygame.Surface, clock: pygame.time.Clock) -> dict:
             sys.exit()
         elif k in ['settings', 'records', 'back']:
             go('main' if k == 'back' else k)
-        elif k == 'speed':
-            speeds = [10, 15, 20, 25, 30, 35]
-            settings['speed'] = speeds[
-                (speeds.index(settings['speed']) + 1) % len(speeds)
-            ]
-        elif k == 'diff':
-            levels = ['Easy', 'Normal', 'Hard']
-            settings['difficulty'] = levels[
-                (levels.index(settings['difficulty']) + 1) % len(levels)
-            ]
-        elif k == 'sound':
-            settings['sound'] = not settings['sound']
-        elif k == 'lang':
-            langs = ['ru', 'en', 'tg']
-            settings['lang'] = langs[
-                (langs.index(settings['lang']) + 1) % len(langs)
-            ]
-        elif k == 'sc':
-            settings['snake_color_idx'] = (
-                settings['snake_color_idx'] + 1
-            ) % len(SNAKE_COLORS)
-        elif k == 'ac':
-            settings['apple_color_idx'] = (
-                settings['apple_color_idx'] + 1
-            ) % len(APPLE_COLORS)
-        elif k == 'ash':
-            settings['apple_shape_idx'] = (
-                settings['apple_shape_idx'] + 1
-            ) % len(APPLE_SHAPES)
 
-    def act(k: str) -> Callable:
-        return lambda: handle_action(k)
+    def cycle_speed() -> None:
+        speeds = [10, 15, 20, 25, 30, 35]
+        settings['speed'] = speeds[
+            (speeds.index(settings['speed']) + 1) % len(speeds)
+        ]
+
+    def cycle_diff() -> None:
+        levels = ['Easy', 'Normal', 'Hard']
+        settings['difficulty'] = levels[
+            (levels.index(settings['difficulty']) + 1) % len(levels)
+        ]
+
+    def toggle_sound() -> None:
+        settings['sound'] = not settings['sound']
+
+    def cycle_lang() -> None:
+        langs = ['ru', 'en', 'tg']
+        settings['lang'] = langs[
+            (langs.index(settings['lang']) + 1) % len(langs)
+        ]
+
+    def cycle_snake() -> None:
+        settings['snake_color_idx'] = (
+            settings['snake_color_idx'] + 1
+        ) % len(SNAKE_COLORS)
+
+    def cycle_apple() -> None:
+        settings['apple_color_idx'] = (
+            settings['apple_color_idx'] + 1
+        ) % len(APPLE_COLORS)
+
+    def cycle_shape() -> None:
+        settings['apple_shape_idx'] = (
+            settings['apple_shape_idx'] + 1
+        ) % len(APPLE_SHAPES)
 
     actions = {
-        k: act(k) for k in [
-            'play', 'exit', 'settings', 'records', 'back',
-            'speed', 'diff', 'sound', 'lang', 'sc', 'ac', 'ash'
-        ]
+        'play': lambda: handle_action('play'),
+        'exit': lambda: handle_action('exit'),
+        'settings': lambda: handle_action('settings'),
+        'records': lambda: handle_action('records'),
+        'back': lambda: handle_action('back'),
+        'speed': cycle_speed,
+        'diff': cycle_diff,
+        'sound': toggle_sound,
+        'lang': cycle_lang,
+        'sc': cycle_snake,
+        'ac': cycle_apple,
+        'ash': cycle_shape,
     }
 
     while menu_running:
