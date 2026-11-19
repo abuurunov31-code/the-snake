@@ -1,7 +1,7 @@
+import os
 import random
 import sys
-import os
-from typing import Optional, Tuple, List, Callable
+from typing import Callable, List, Optional, Tuple
 
 import pygame
 
