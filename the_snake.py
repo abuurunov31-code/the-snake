@@ -190,9 +190,9 @@ def draw_game(
     apple.draw(screen)
     snake.draw(screen)
     font = pygame.font.Font(None, 30)
-    score_text = font.render(f"Очки: {score}", True, TEXT_COLOR)
+    score_text = font.render(f'Очки: {score}', True, TEXT_COLOR)
     highscore_text = font.render(
-        f"Рекорд: {highscore}", True, HIGHLIGHT_COLOR
+        f'Рекорд: {highscore}', True, HIGHLIGHT_COLOR
     )
     screen.blit(score_text, (10, 10))
     screen.blit(
