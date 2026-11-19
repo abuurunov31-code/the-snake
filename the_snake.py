@@ -17,10 +17,7 @@ TEXT_COLOR = (255, 255, 255)
 HIGHLIGHT_COLOR = (255, 215, 0)
 
 SNAKE_COLORS = [
-    (50, 255, 50),
-    (50, 150, 255),
-    (255, 255, 50),
-    (255, 100, 200)
+    (50, 255, 50), (50, 150, 255), (255, 255, 50), (255, 100, 200)
 ]
 APPLE_COLORS = [(255, 50, 50), (255, 215, 0), (200, 50, 255)]
 APPLE_SHAPES = ['Квадрат', 'Круг', 'Яблоко']
@@ -335,22 +332,10 @@ def draw_main_menu(
     """Отрисовывает главное меню."""
     screen.fill(BOARD_BACKGROUND_COLOR)
     return [
-        Button(
-            t['play'], 220, 100, 200, 50, (100, 255, 100),
-            a['play'], s
-        ),
-        Button(
-            t['settings'], 220, 170, 200, 50, (255, 255, 100),
-            a['settings'], s
-        ),
-        Button(
-            t['records'], 220, 240, 200, 50, (255, 215, 0),
-            a['records'], s
-        ),
-        Button(
-            t['exit'], 220, 310, 200, 50, (255, 100, 100),
-            a['exit'], s
-        ),
+        Button(t['play'], 220, 100, 200, 50, (100, 255, 100), a['play'], s),
+        Button(t['settings'], 220, 170, 200, 50, (255, 255, 100), a['settings'], s),
+        Button(t['records'], 220, 240, 200, 50, (255, 215, 0), a['records'], s),
+        Button(t['exit'], 220, 310, 200, 50, (255, 100, 100), a['exit'], s),
     ]
 
 
@@ -363,50 +348,20 @@ def draw_settings_menu(
 ) -> List[Button]:
     """Отрисовывает меню настроек."""
     screen.fill(BOARD_BACKGROUND_COLOR)
-    title = pygame.font.Font(None, 50).render(
-        t['settings'], True, TEXT_COLOR
-    )
+    title = pygame.font.Font(None, 50).render(t['settings'], True, TEXT_COLOR)
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 10))
-    diff_map = {'Easy': t['easy'], 'Normal': t['normal'], 'Hard': t['hard']}
-
-    sound_text = f"{t['sound']}: "
-    sound_text += t['on'] if st['sound'] else t['off']
-
-    shape_text = f"{t['apple_shape']}: "
-    shape_text += APPLE_SHAPES[st['apple_shape_idx']]
-
+    dm = {'Easy': t['easy'], 'Normal': t['normal'], 'Hard': t['hard']}
+    sound_txt = f"{t['sound']}: {t['on'] if st['sound'] else t['off']}"
+    shape_txt = f"{t['apple_shape']}: {APPLE_SHAPES[st['apple_shape_idx']]}"
     return [
-        Button(
-            f"{t['speed']}: {st['speed']}",
-            170, 60, 300, 35, (255, 200, 200), a['speed'], s
-        ),
-        Button(
-            f"{t['difficulty']}: {diff_map[st['difficulty']]}",
-            170, 105, 300, 35, (200, 200, 255), a['diff'], s
-        ),
-        Button(
-            sound_text,
-            170, 150, 300, 35, (200, 255, 200), a['sound'], s
-        ),
-        Button(
-            f"{t['lang_btn']}: {st['lang'].upper()}",
-            170, 195, 300, 35, (255, 255, 150), a['lang'], s
-        ),
-        Button(
-            f"{t['snake_color']}: {st['snake_color_idx'] + 1}",
-            170, 240, 300, 35, (150, 255, 255), a['sc'], s
-        ),
-        Button(
-            f"{t['apple_color']}: {st['apple_color_idx'] + 1}",
-            170, 285, 300, 35, (255, 200, 150), a['ac'], s
-        ),
-        Button(
-            shape_text,
-            170, 330, 300, 35, (200, 150, 255), a['ash'], s
-        ),
-        Button(
-            t['back'], 220, 400, 200, 40, (100, 100, 255), a['back'], s
-        ),
+        Button(f"{t['speed']}: {st['speed']}", 170, 60, 300, 35, (255, 200, 200), a['speed'], s),
+        Button(f"{t['difficulty']}: {dm[st['difficulty']]}", 170, 105, 300, 35, (200, 200, 255), a['diff'], s),
+        Button(sound_txt, 170, 150, 300, 35, (200, 255, 200), a['sound'], s),
+        Button(f"{t['lang_btn']}: {st['lang'].upper()}", 170, 195, 300, 35, (255, 255, 150), a['lang'], s),
+        Button(f"{t['snake_color']}: {st['snake_color_idx'] + 1}", 170, 240, 300, 35, (150, 255, 255), a['sc'], s),
+        Button(f"{t['apple_color']}: {st['apple_color_idx'] + 1}", 170, 285, 300, 35, (255, 200, 150), a['ac'], s),
+        Button(shape_txt, 170, 330, 300, 35, (200, 150, 255), a['ash'], s),
+        Button(t['back'], 220, 400, 200, 40, (100, 100, 255), a['back'], s),
     ]
 
 
@@ -418,95 +373,46 @@ def draw_records_menu(
 ) -> List[Button]:
     """Отрисовывает меню рекордов."""
     screen.fill(BOARD_BACKGROUND_COLOR)
-    title = pygame.font.Font(None, 50).render(
-        t['records'], True, TEXT_COLOR
-    )
+    title = pygame.font.Font(None, 50).render(t['records'], True, TEXT_COLOR)
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 50))
-    highscore = load_highscore()
-    score_text = pygame.font.Font(None, 50).render(
-        f"{t['best']}: {highscore}", True, HIGHLIGHT_COLOR
-    )
-    screen.blit(
-        score_text,
-        (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 180)
-    )
-    return [
-        Button(
-            t['back'], 220, 380, 200, 50, (100, 100, 255), a['back'], s
-        )
-    ]
+    hs = load_highscore()
+    score_text = pygame.font.Font(None, 50).render(f"{t['best']}: {hs}", True, HIGHLIGHT_COLOR)
+    screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 180))
+    return [Button(t['back'], 220, 380, 200, 50, (100, 100, 255), a['back'], s)]
 
 
-def show_menu(screen: pygame.Surface, clock: pygame.time.Clock) -> dict:
-    """Отображает главное меню."""
-    menu_running = True
-    current_screen = 'main'
-    settings = {
-        'speed': 20, 'difficulty': 'Normal', 'sound': True, 'lang': 'ru',
-        'snake_color_idx': 0, 'apple_color_idx': 0, 'apple_shape_idx': 0
-    }
-
-    try:
-        click_sound = pygame.mixer.Sound('click.wav')
-    except (pygame.error, IOError):
-        click_sound = None
-
-    def go(name: str) -> None:
-        nonlocal current_screen
-        current_screen = name
-
-    def handle_action(k: str) -> None:
-        nonlocal menu_running
-        if k == 'play':
-            menu_running = False
-        elif k == 'exit':
-            pygame.quit()
-            sys.exit()
-        elif k in ['settings', 'records', 'back']:
-            go('main' if k == 'back' else k)
-
+def create_actions(settings: dict, go: Callable, set_run: Callable) -> dict:
+    """Создает словарь действий для кнопок меню."""
     def cycle_speed() -> None:
-        speeds = [10, 15, 20, 25, 30, 35]
-        settings['speed'] = speeds[
-            (speeds.index(settings['speed']) + 1) % len(speeds)
-        ]
+        sp = [10, 15, 20, 25, 30, 35]
+        settings['speed'] = sp[(sp.index(settings['speed']) + 1) % len(sp)]
 
     def cycle_diff() -> None:
-        levels = ['Easy', 'Normal', 'Hard']
-        settings['difficulty'] = levels[
-            (levels.index(settings['difficulty']) + 1) % len(levels)
-        ]
+        lv = ['Easy', 'Normal', 'Hard']
+        settings['difficulty'] = lv[(lv.index(settings['difficulty']) + 1) % len(lv)]
 
     def toggle_sound() -> None:
         settings['sound'] = not settings['sound']
 
     def cycle_lang() -> None:
-        langs = ['ru', 'en', 'tg']
-        settings['lang'] = langs[
-            (langs.index(settings['lang']) + 1) % len(langs)
-        ]
+        lg = ['ru', 'en', 'tg']
+        settings['lang'] = lg[(lg.index(settings['lang']) + 1) % len(lg)]
 
     def cycle_snake() -> None:
-        settings['snake_color_idx'] = (
-            settings['snake_color_idx'] + 1
-        ) % len(SNAKE_COLORS)
+        settings['snake_color_idx'] = (settings['snake_color_idx'] + 1) % len(SNAKE_COLORS)
 
     def cycle_apple() -> None:
-        settings['apple_color_idx'] = (
-            settings['apple_color_idx'] + 1
-        ) % len(APPLE_COLORS)
+        settings['apple_color_idx'] = (settings['apple_color_idx'] + 1) % len(APPLE_COLORS)
 
     def cycle_shape() -> None:
-        settings['apple_shape_idx'] = (
-            settings['apple_shape_idx'] + 1
-        ) % len(APPLE_SHAPES)
+        settings['apple_shape_idx'] = (settings['apple_shape_idx'] + 1) % len(APPLE_SHAPES)
 
-    actions = {
-        'play': lambda: handle_action('play'),
-        'exit': lambda: handle_action('exit'),
-        'settings': lambda: handle_action('settings'),
-        'records': lambda: handle_action('records'),
-        'back': lambda: handle_action('back'),
+    return {
+        'play': lambda: set_run(False),
+        'exit': lambda: sys.exit(),
+        'settings': lambda: go('settings'),
+        'records': lambda: go('records'),
+        'back': lambda: go('main'),
         'speed': cycle_speed,
         'diff': cycle_diff,
         'sound': toggle_sound,
@@ -516,32 +422,86 @@ def show_menu(screen: pygame.Surface, clock: pygame.time.Clock) -> dict:
         'ash': cycle_shape,
     }
 
-    while menu_running:
+
+def show_menu(screen: pygame.Surface, clock: pygame.time.Clock) -> dict:
+    """Отображает главное меню."""
+    settings = {'speed': 20, 'difficulty': 'Normal', 'sound': True, 'lang': 'ru', 'snake_color_idx': 0, 'apple_color_idx': 0, 'apple_shape_idx': 0}
+    try:
+        s = pygame.mixer.Sound('click.wav')
+    except (pygame.error, IOError):
+        s = None
+
+    curr = ['main']
+    run = [True]
+
+    def go(name: str) -> None:
+        curr[0] = name
+
+    def set_run(val: bool) -> None:
+        run[0] = val
+
+    actions = create_actions(settings, go, set_run)
+
+    while run[0]:
         t = translations[settings['lang']]
-        if current_screen == 'main':
-            buttons = draw_main_menu(screen, t, click_sound, actions)
-        elif current_screen == 'settings':
-            buttons = draw_settings_menu(
-                screen, t, settings, click_sound, actions
-            )
+        if curr[0] == 'main':
+            buttons = draw_main_menu(screen, t, s, actions)
+        elif curr[0] == 'settings':
+            buttons = draw_settings_menu(screen, t, settings, s, actions)
         else:
-            buttons = draw_records_menu(
-                screen, t, click_sound, actions
-            )
+            buttons = draw_records_menu(screen, t, s, actions)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                for button in buttons:
-                    button.check_click(event.pos)
+                for btn in buttons:
+                    btn.check_click(event.pos)
 
-        for button in buttons:
-            button.draw(screen)
+        for btn in buttons:
+            btn.draw(screen)
         pygame.display.flip()
         clock.tick(30)
     return settings
+
+
+# --- ОСНОВНАЯ ИГРА ---
+def handle_input(snake: Snake) -> None:
+    """Обрабатывает нажатия клавиш."""
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_UP and snake.direction != DOWN:
+                snake.next_direction = UP
+            elif event.key == pygame.K_DOWN and snake.direction != UP:
+                snake.next_direction = DOWN
+            elif event.key == pygame.K_LEFT and snake.direction != RIGHT:
+                snake.next_direction = LEFT
+            elif event.key == pygame.K_RIGHT and snake.direction != LEFT:
+                snake.next_direction = RIGHT
+
+
+def check_collisions(snake: Snake, obstacles: List[Obstacle]) -> bool:
+    """Проверяет, жива ли змейка."""
+    head_x, head_y = snake.get_head_position()
+    dx, dy = snake.direction
+    nh = ((head_x + dx * GRID_SIZE) % SCREEN_WIDTH, (head_y + dy * GRID_SIZE) % SCREEN_HEIGHT)
+    return nh not in snake.positions[:-1] and nh not in [o.position for o in obstacles]
+
+
+def draw_game(screen: pygame.Surface, snake: Snake, apple: Apple, obs: List[Obstacle], golden: Optional[GoldenApple], score: int, highscore: int, t: dict) -> None:
+    """Отрисовывает игровой процесс."""
+    screen.fill(BOARD_BACKGROUND_COLOR)
+    for o in obs:
+        o.draw(screen)
+    apple.draw(screen)
+    if golden:
+        golden.draw(screen)
+    snake.draw(screen)
+    font = pygame.font.Font(None, 30)
+    screen.blit(font.render(f"{t['score']}: {score}", True, TEXT_COLOR), (10, 10))
+    screen.blit(font.render(f"{t['best']}: {highscore}", True, HIGHLIGHT_COLOR), (SCREEN_WIDTH - 150, 10))
 
 
 def main() -> None:
@@ -562,109 +522,56 @@ def main() -> None:
     settings = show_menu(screen, clock)
     t = translations[settings['lang']]
     score = 0
-    highscore = load_highscore()
-    font_score = pygame.font.Font(None, 30)
+    hs = load_highscore()
 
-    obstacles = []
+    obs = []
     count = 10 if settings['difficulty'] == 'Normal' else 20
     for _ in range(count):
-        pos = (
-            random.randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-            random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-        )
-        obstacles.append(Obstacle(pos))
+        pos = (random.randint(0, GRID_WIDTH - 1) * GRID_SIZE, random.randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
+        obs.append(Obstacle(pos))
 
     snake = Snake(color=SNAKE_COLORS[settings['snake_color_idx']])
-    apple = Apple(
-        color=APPLE_COLORS[settings['apple_color_idx']],
-        shape=APPLE_SHAPES[settings['apple_shape_idx']]
-    )
-    apple.randomize_position(obstacles, snake.positions)
-    golden_apple = None
+    apple = Apple(color=APPLE_COLORS[settings['apple_color_idx']], shape=APPLE_SHAPES[settings['apple_shape_idx']])
+    apple.randomize_position(obs, snake.positions)
+    golden = None
 
     running = True
     while running:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP and snake.direction != DOWN:
-                    snake.next_direction = UP
-                elif event.key == pygame.K_DOWN and snake.direction != UP:
-                    snake.next_direction = DOWN
-                elif event.key == pygame.K_LEFT and snake.direction != RIGHT:
-                    snake.next_direction = LEFT
-                elif event.key == pygame.K_RIGHT and snake.direction != LEFT:
-                    snake.next_direction = RIGHT
-
+        handle_input(snake)
         snake.update_direction()
-        head_x, head_y = snake.get_head_position()
-        dx, dy = snake.direction
-        next_head = (
-            (head_x + dx * GRID_SIZE) % SCREEN_WIDTH,
-            (head_y + dy * GRID_SIZE) % SCREEN_HEIGHT
-        )
 
-        is_alive = next_head not in snake.positions[:-1]
-        if next_head in [obs.position for obs in obstacles]:
-            is_alive = False
-
-        if not is_alive:
-            if crash_sound and settings['sound']:
-                crash_sound.play()
-            if score > highscore:
-                highscore = score
-                save_highscore(highscore)
-            snake.reset()
-            apple.randomize_position(obstacles, snake.positions)
-            golden_apple = None
-            score = 0
-        else:
+        if check_collisions(snake, obs):
             snake.move()
             if snake.get_head_position() == apple.position:
                 snake.length += 1
-                apple.randomize_position(obstacles, snake.positions)
+                apple.randomize_position(obs, snake.positions)
                 if eat_sound and settings['sound']:
                     eat_sound.play()
                 score += 10
-                if random.random() < 0.2 and golden_apple is None:
-                    golden_apple = GoldenApple(
-                        shape=APPLE_SHAPES[settings['apple_shape_idx']]
-                    )
-                    golden_apple.randomize_position(
-                        obstacles, snake.positions
-                    )
-
-            if golden_apple:
-                if not golden_apple.update():
-                    golden_apple = None
-                elif snake.get_head_position() == golden_apple.position:
+                if random.random() < 0.2 and golden is None:
+                    golden = GoldenApple(shape=APPLE_SHAPES[settings['apple_shape_idx']])
+                    golden.randomize_position(obs, snake.positions)
+            if golden:
+                if not golden.update():
+                    golden = None
+                elif snake.get_head_position() == golden.position:
                     snake.length += 3
                     score += 30
-                    golden_apple = None
+                    golden = None
                     if eat_sound and settings['sound']:
                         eat_sound.play()
+        else:
+            if crash_sound and settings['sound']:
+                crash_sound.play()
+            if score > hs:
+                hs = score
+                save_highscore(hs)
+            snake.reset()
+            apple.randomize_position(obs, snake.positions)
+            golden = None
+            score = 0
 
-        screen.fill(BOARD_BACKGROUND_COLOR)
-        for obs in obstacles:
-            obs.draw(screen)
-        apple.draw(screen)
-        if golden_apple:
-            golden_apple.draw(screen)
-        snake.draw(screen)
-
-        score_text = font_score.render(
-            f"{t['score']}: {score}", True, TEXT_COLOR
-        )
-        highscore_text = font_score.render(
-            f"{t['best']}: {highscore}", True, HIGHLIGHT_COLOR
-        )
-        screen.blit(score_text, (10, 10))
-        screen.blit(
-            highscore_text,
-            (SCREEN_WIDTH - highscore_text.get_width() - 10, 10)
-        )
-
+        draw_game(screen, snake, apple, obs, golden, score, hs, t)
         pygame.display.update()
         clock.tick(settings['speed'])
 
