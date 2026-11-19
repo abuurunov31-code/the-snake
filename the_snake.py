@@ -26,7 +26,6 @@ HIGHSCORE_FILE = 'highscore.txt'
 
 # --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (ТРЕБУЮТСЯ ТЕСТАМИ) ---
 pygame.init()
-pygame.mixer.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Змейка')
 clock = pygame.time.Clock()
