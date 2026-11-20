@@ -24,7 +24,7 @@ LEFT = (-1, 0)
 RIGHT = (1, 0)
 HIGHSCORE_FILE = 'highscore.txt'
 
-# --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ (ТРЕБУЮТСЯ ТЕСТАМИ) ---
+# --- ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ---
 pygame.init()
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption('Змейка')
@@ -220,12 +220,9 @@ def main() -> None:
         handle_keys(snake)
         snake.update_direction()
 
-        # Ревьюер: "достаточно просто получить голову змейки"
-        old_head = snake.get_head_position()
         snake.move()
         new_head = snake.get_head_position()
 
-        # Проверка на столкновение с собой
         if new_head in snake.positions[1:]:
             if score > highscore:
                 highscore = score
