@@ -61,7 +61,7 @@ class GameObject:
 
     def draw(self, surface: pygame.Surface) -> None:
         """Метод для отрисовки объекта."""
-        raise NotImplementedError
+        raise NotImplementedError('Реализуйте метод в подклассе')
 
     def draw_cell(
         self,
@@ -216,19 +216,17 @@ def main() -> None:
     apple = Apple()
     apple.randomize_position(snake.positions)
 
-    running = True
-    while running:
+    while True:
         handle_keys(snake)
         snake.update_direction()
 
-        head_x, head_y = snake.get_head_position()
-        dx, dy = snake.direction
-        next_head = (
-            (head_x + dx * GRID_SIZE) % SCREEN_WIDTH,
-            (head_y + dy * GRID_SIZE) % SCREEN_HEIGHT
-        )
+        # Ревьюер: "достаточно просто получить голову змейки"
+        old_head = snake.get_head_position()
+        snake.move()
+        new_head = snake.get_head_position()
 
-        if next_head in snake.positions[:-1]:
+        # Проверка на столкновение с собой
+        if new_head in snake.positions[1:]:
             if score > highscore:
                 highscore = score
                 save_highscore(highscore)
@@ -236,8 +234,7 @@ def main() -> None:
             apple.randomize_position(snake.positions)
             score = 0
         else:
-            snake.move()
-            if snake.get_head_position() == apple.position:
+            if new_head == apple.position:
                 snake.length += 1
                 apple.randomize_position(snake.positions)
                 score += 10
